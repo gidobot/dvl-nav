@@ -329,6 +329,7 @@ for t in range(len(ts.df)):
 voc_u_list,voc_v_list,voc_w_list,voc_z_list = water_column.compute_averages()
 print("> Finished Estimating Water Column Currents!")
 # print(water_column.averages_to_str())
+
 #%% NPS Data Dump
 # current_data = pd.DataFrame({'z': voc_z_list, 'N':voc_u_list, 'E': voc_v_list, 'D': voc_w_list})
 # #(current_data)
@@ -496,6 +497,20 @@ ts.df['delta_x']   = delta_x_list
 ts.df['delta_y']   = delta_y_list
 
 print("> Finished Calculating Odometry!")
+
+#%% Extract all ocean Current
+#Extract all of Ocean Current Data
+ocean_current_log = {}
+for t in range(1,len(ts.df.time)):
+# for t in range(1,5):
+    shear_node_list = []
+    shear_node = water_column.get_voc_at_time(t)
+    if type(shear_node) == list:
+        for i in range(1,len(shear_node)):
+            shear_node_list.append([shear_node[i].z_true, shear_node[i].z_bin, shear_node[i].voc.u,shear_node[i].voc.v])
+    else:
+       shear_node_list = []
+    ocean_current_log[t] = [ts.df.depth[t], ts.df.rel_pos_x[t], ts.df.rel_pos_y[t], shear_node_list]
 #%% Plot only DVL-ODO
 
 # extract the relevant portion of the glider flight computer

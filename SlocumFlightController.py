@@ -44,7 +44,7 @@ class SlocumFlightController(object):
             'm_de_oil_vol',
             'm_battpos',
             'm_thruster_power',
-            'm_thruster_current'
+            'm_thruster_current',
             
             # Controller Variables 
             'c_pitch',

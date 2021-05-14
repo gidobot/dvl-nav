@@ -1109,8 +1109,8 @@ def plot_water_column_currents(voc_u_list, voc_v_list, voc_w_list, voc_z_list,
     plt.ylim(-max_current,max_current)
     plt.title('Water Column, 3D View')
     plt.suptitle('Water Column Currents', fontweight='bold')
-    if save_name: plt.savefig('/Users/zduguid/Desktop/fig/%s' % save_name)
-    else:         plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
+    #if save_name: plt.savefig('/Users/zduguid/Desktop/fig/%s' % save_name)
+    #else:         plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
 
 
 
