@@ -89,6 +89,7 @@ BathyData = {
     'BuzzardsBay' : {
         'filepath'  : "C:/Users/grego/Dropbox/NSF Arctic NNA/Environment-Data/BuzzardsBay-10m/BuzzBay_10m.tif",
         'latlon_format'    : False,
+        #'crop'  : None,
         'crop'  : [1500, 5740, 1500, 6200],
             # crop  = [top, bot, left, right]
             # bathy = bathy_im[top:bot, left:right]

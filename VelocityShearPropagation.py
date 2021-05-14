@@ -161,6 +161,18 @@ class WaterColumn(object):
         z_bin = self.get_wc_bin(z)
         return(self.shear_node_dict[z_bin])
 
+    def get_voc_at_time(self, time):
+        """Get the water column currents recorded at a particular time."""
+        list_of_nodes_at_time = []
+        for z in range(0,self.MAX_DEPTH,self.WC_BIN_LEN):
+            z_bin = self.get_wc_bin(z)
+            for j in range(0, len(self.shear_node_dict[z_bin])):
+                if ((self.shear_node_dict[z_bin][j].t) == time):
+                    list_of_nodes_at_time.append(self.shear_node_dict[z_bin][j])
+        if len(list_of_nodes_at_time) != 0 :
+            return list_of_nodes_at_time
+        else:
+            return np.NaN      
 
     def compute_averages(self):
         """Computes average water column currents for each depth bin."""
@@ -217,6 +229,9 @@ class WaterColumn(object):
             string += str(self.avg_voc_dict[z])
             string += '\n'
         return(string)
+
+    def save_avg_water_column(self):
+        """Saves computed average water column to CSV file with following header: Depth (m) North Velocity (m/s) East Velocity (m/s) and Down Velocity (m/s0) """
 
 
     def add_shear_node(self, z_true, t, shear_list, voc_ref=OceanCurrent(), 
