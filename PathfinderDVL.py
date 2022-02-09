@@ -2,6 +2,7 @@
 #
 # Superclass for Pathfinder DVL data 
 #   2020-05-05  zduguid@mit.edu         initial implementation
+#   2021-08-23  gburgess@mit.edu        Removed BIAS_PITCH for unit 250 and added unit 270 BIASES
 
 import numpy as np
 
@@ -27,15 +28,22 @@ class PathfinderDVL(object):
         #   + set values for num_beams and num_bins for more efficient 
         #     array processing and ensemble storage. 
         self.NUM_BEAMS_EXP = 4       # expected number of DVL beams  
-        self.NUM_BINS_EXP  = 40      # expected number of bins (or cells)
+        self.NUM_BINS_EXP  = 20      # expected number of bins (or cells)
         self.BAD_VELOCITY  = -32768  # value that represents invalid velocity 
         self.BAD_BT_RANGE  = 0       # value that represents invalid range
         self.MAX_ENS_NUM   = 65536   # max number of ensembles before rollover
 
         # mounting bias parameters 
-        self.BIAS_PITCH   = 12.5  # [deg]
+
+        #Unit 770
+        self.BIAS_PITCH   =  0.0  # [deg]
         self.BIAS_ROLL    =  0.0  # [deg]
         self.BIAS_HEADING =  0.0  # [deg]
+
+        #Unit 250
+        #self.BIAS_PITCH   = 12.5  # [deg]
+        #self.BIAS_ROLL    =  0.0  # [deg]
+        #self.BIAS_HEADING =  0.0  # [deg]
 
         # self.BIAS_PITCH   =  8.0  # [deg]
         # self.BIAS_ROLL    =  0.0  # [deg]
