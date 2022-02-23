@@ -72,6 +72,7 @@ class SlocumFlightController(object):
             'x_lmc_xy_source',
             'c_wpt_x_lmc',
             'c_wpt_y_lmc',
+            'm_dist_to_wpt',
 
             # Lat/Lon Variables
             'm_lat',
@@ -95,7 +96,26 @@ class SlocumFlightController(object):
             'm_appear_to_be_at_surface',
             'm_science_clothesline_lag',
             'sci_m_present_time',
-            'x_software_ver'
+            'x_software_ver',
+            'x_in_gliderdos',
+
+            # u_mission_params
+            'u_mission_param_a',
+            'u_mission_param_b',
+            'u_mission_param_c',
+            'u_mission_param_d',
+            'u_mission_param_e',
+            'u_mission_param_f',
+            'u_mission_param_g',
+            'u_mission_param_h',
+            'u_mission_param_i',
+            'u_mission_param_j',
+            'u_mission_param_k',
+            'u_mission_param_l',
+            'u_mission_param_m',
+            'u_mission_param_n',
+            'u_mission_mode',
+            'sci_mission_mode'
         ]
         self._header        = None
         self._df            = None

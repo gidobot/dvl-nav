@@ -8,3 +8,5 @@ __pycache__/
 pd0-parsed/
 pd0-raw/
 misc_data/
+field_data/
+.venv/
