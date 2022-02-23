@@ -5,8 +5,7 @@ BathyData = {
     # Kolumbo Data Subset
     ##################################################
     'Kolumbo' : {
-        # 'filepath'  : "/Users/zduguid/Dropbox (MIT)/MIT-WHOI/Kolumbo cruise 2019/Grids/kolumbo bathymetry.tif",
-        'filepath'  : "C:/Users/grego/Dropbox/Kolumbo cruise 2019/zduguid/bathy/Kolumbo-10m.tif",
+        'filepath'  : "/home/gburgess/dvl-nav/data/field_data/kolumbo/bathy/Kolumbo-10m.tif",
         'latlon_format' : True,
         'crop'  : [700, 1501, 700, 1300],
         # 'crop'  : [0, 2000, 0, 2000],
@@ -21,17 +20,14 @@ BathyData = {
         'depth_max' : None,
         'depth_filter' : None,
     },
-
-
+    
     ##################################################
     # Kolumbo Data Full
     ##################################################
     'Kolumbo_full' : {
-        'filepath'  : "C:/Users/grego/Dropbox/Kolumbo cruise 2019/zduguid/bathy/Kolumbo-10m.tif",
-        'latlon_format' : False,
+        'filepath'  : "/home/gburgess/dvl-nav/data/field_data/kolumbo/bathy/Kolumbo-10m.tif",
+        'latlon_format' : True,
         'crop'  : None,
-            # crop  = [top, bot, left, right]
-            # bathy = bathy_im[top:bot, left:right]
         'name' : 'Kolumbo Volcano, Greece',
         'xlabel': 'Longitude [deg]',
         'ylabel': 'Latitude [deg]',
@@ -42,52 +38,31 @@ BathyData = {
         'depth_filter' : None,
     },
 
-
     ##################################################
-    # Kolumbo Data Full
+    # Puerto Rico Data
     ##################################################
-    'Kolumbo_full_AR' : {
-        'filepath'  : "C:/Users/grego/Dropbox/Kolumbo cruise 2019/zduguid/bathy/Kolumbo-10m.tif",
-        'latlon_format'    : True,
+    'Puerto_Rico' : {
+        'filepath'  : "/home/gburgess/dvl-nav/data/field_data/puerto_rico/bathy/PuertoRico_SouthWest.tif",
+        'latlon_format' : True,
         'crop'  : None,
-            # crop  = [top, bot, left, right]
-            # bathy = bathy_im[top:bot, left:right]
-        'name' : 'Kolumbo Volcano, Greece',
+        # 'crop'  : [0, 2000, 0, 2000],
+        # crop  = [top, bot, left, right]
+        # bathy = bathy_im[top:bot, left:right]
+        'name' : 'Puerto Rico',
         'xlabel': 'Longitude [deg]',
         'ylabel': 'Latitude [deg]',
-        'tick_format' : '%.3f',
+        'tick_format' : '%.2f',
         'num_ticks' : 3,
         'slope_max' : None,
         'depth_max' : None,
         'depth_filter' : None,
     },
-
-
-    ##################################################
-    # Santorini Data Full
-    ##################################################
-    'Santorini_full' : {
-        'filepath'  : "C:/Users/grego/Dropbox/Kolumbo cruise 2019/zduguid/bathy/Christiana-Santorini-Kolumbo.tif",
-        'latlon_format'    : True,
-        'crop'  : None,
-            # crop  = [top, bot, left, right]
-            # bathy = bathy_im[top:bot, left:right]
-        'name' : 'Kolumbo Volcano, Greece',
-        'xlabel': 'Longitude [deg]',
-        'ylabel': 'Latitude [deg]',
-        'tick_format' : '%.3f',
-        'num_ticks' : 3,
-        'slope_max' : None,
-        'depth_max' : None,
-        'depth_filter' : None,
-    },
-
 
     ##################################################
     # Buzzards Bay Data
     ##################################################
     'BuzzardsBay' : {
-        'filepath'  : "C:/Users/grego/Dropbox/NSF Arctic NNA/Environment-Data/BuzzardsBay-10m/BuzzBay_10m.tif",
+        'filepath'  : "/home/gburgess/dvl-nav/data/field_data/buzz_bay/bathy/BuzzBay_10m.tif",
         'latlon_format'    : False,
         #'crop'  : None,
         'crop'  : [1500, 5740, 1500, 6200],
@@ -108,6 +83,28 @@ BathyData = {
         }
     },
 
+    ##################################################
+    # Santorini Data Full
+    ##################################################
+    'Santorini_full' : {
+        'filepath'  : "/home/gburgess/dvl-nav/data/field_data/kolumbo/bathy/Christiana-Santorini-Kolumbo.tif",
+        'latlon_format'    : True,
+        'crop'  : None,
+            # crop  = [top, bot, left, right]
+            # bathy = bathy_im[top:bot, left:right]
+        'name' : 'Kolumbo Volcano, Greece',
+        'xlabel': 'Longitude [deg]',
+        'ylabel': 'Latitude [deg]',
+        'tick_format' : '%.3f',
+        'num_ticks' : 3,
+        'slope_max' : None,
+        'depth_max' : None,
+        'depth_filter' : None,
+    },
+
+########################################################################################
+# Not kept up to date below
+########################################################################################
 
     ##################################################
     # Costa Rica Data Area1
@@ -268,5 +265,4 @@ BathyData = {
         'num_ticks' : 3,
         'meta'  : None,
     },
-    
 }
