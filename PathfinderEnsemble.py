@@ -452,8 +452,8 @@ class PathfinderEnsemble(PathfinderDVL):
         Uses information from other variables 
         """
         # check that the DVL is reporting data in earth coordinates
-        EARTH_FRAME = 'Instrument Coords'
-        #EARTH_FRAME = 'Earth Coords'
+        #EARTH_FRAME = 'Instrument Coords'
+        EARTH_FRAME = 'Earth Coords'
         MIN_PITCH   = 0.001
         EPSILON     = 0.001
         MAX_SPEED   = 1.3 

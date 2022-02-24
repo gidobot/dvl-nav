@@ -28,7 +28,8 @@ class PathfinderDVL(object):
         #   + set values for num_beams and num_bins for more efficient 
         #     array processing and ensemble storage. 
         self.NUM_BEAMS_EXP = 4       # expected number of DVL beams  
-        self.NUM_BINS_EXP  = 20      # expected number of bins (or cells)
+        #TODO Current unit770 explorer dvl set to 20 bins. 40 for kolumbo
+        self.NUM_BINS_EXP  = 40      # expected number of bins (or cells)
         self.BAD_VELOCITY  = -32768  # value that represents invalid velocity 
         self.BAD_BT_RANGE  = 0       # value that represents invalid range
         self.MAX_ENS_NUM   = 65536   # max number of ensembles before rollover
@@ -36,14 +37,14 @@ class PathfinderDVL(object):
         # mounting bias parameters 
 
         #Unit 770
-        self.BIAS_PITCH   =  0.0  # [deg]
-        self.BIAS_ROLL    =  0.0  # [deg]
-        self.BIAS_HEADING =  0.0  # [deg]
+        # self.BIAS_PITCH   =  0.0  # [deg]
+        # self.BIAS_ROLL    =  0.0  # [deg]
+        # self.BIAS_HEADING =  0.0  # [deg]
 
         #Unit 250
-        #self.BIAS_PITCH   = 12.5  # [deg]
-        #self.BIAS_ROLL    =  0.0  # [deg]
-        #self.BIAS_HEADING =  0.0  # [deg]
+        self.BIAS_PITCH   = 12.5  # [deg]
+        self.BIAS_ROLL    =  0.0  # [deg]
+        self.BIAS_HEADING =  0.0  # [deg]
 
         # self.BIAS_PITCH   =  8.0  # [deg]
         # self.BIAS_ROLL    =  0.0  # [deg]
