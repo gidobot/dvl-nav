@@ -44,8 +44,9 @@ BathyData = {
     'Puerto_Rico' : {
         'filepath'  : "/home/gburgess/dvl-nav/data/field_data/puerto_rico/bathy/PuertoRico_SouthWest.tif",
         'latlon_format' : True,
-        'crop'  : None,
-        # 'crop'  : [0, 2000, 0, 2000],
+        #'crop'  : None,
+        'crop'  : [1500, 1600, 1000, 1100,],
+        #'crop'  : [1500, 7500, 1000, 12500],
         # crop  = [top, bot, left, right]
         # bathy = bathy_im[top:bot, left:right]
         'name' : 'Puerto Rico',

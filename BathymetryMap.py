@@ -9,9 +9,8 @@ import numpy as np
 import datetime
 import rasterio as rio
 import importlib
-#should be able to delete
-#import earthpy as et
-#import earthpy.plot as ep
+import earthpy as et
+import earthpy.plot as ep
 import scipy
 import scipy.signal
 import os
