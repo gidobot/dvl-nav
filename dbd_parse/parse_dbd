@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#Loop through all .dbd files
+
+./dbd2asc
+
+read -p "Press [Enter] key to start parsing..."
+for f in *.dbd
+do
+	echo PARSING: $f
+	name=${f/.dbd/.asc}
+	touch $name
+	
+	./dbd2asc $f > $name
+	echo DONE PARSING
+done
