@@ -99,6 +99,11 @@ class SlocumFlightController(object):
             'x_software_ver',
             'x_in_gliderdos',
 
+            # PAR Sensor
+            'c_bsipar_on',
+            'sci_bsipar_par',
+            'sci_bsipar_sensor_volts',
+            
             # u_mission_params
             'u_mission_param_a',
             'u_mission_param_b',
