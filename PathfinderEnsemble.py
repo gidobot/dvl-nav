@@ -5,6 +5,7 @@
 #   2018-11-26  dpingal@teledyne.com    implemented pd0_parser.py
 #   2020-01-27  zduguid@mit.edu         implemented PathfinderEnsemble.py
 #   2020-05-05  zduguid@mit.edu         reorganized code with DVL superclass 
+#   2022-03-07  gburgess@mit.edu        suppport for instrument frame in derived variables
 
 import numpy as np 
 import pandas as pd
@@ -453,15 +454,16 @@ class PathfinderEnsemble(PathfinderDVL):
         """
         # check that the DVL is reporting data in earth coordinates
         #EARTH_FRAME = 'Instrument Coords'
+        INSTRUMENT_FRAME = 'Instrument Coords'
         EARTH_FRAME = 'Earth Coords'
         MIN_PITCH   = 0.001
         EPSILON     = 0.001
         MAX_SPEED   = 1.3 
 
         coordinate_frame = self.parse_coordinate_transformation(verbose=False)
-        if coordinate_frame != EARTH_FRAME:
-            raise ValueError('Bad coord frame: expected = %s, actual = %s' % 
-                             (EARTH_FRAME, coordinate_frame))
+        if (coordinate_frame != EARTH_FRAME) or (coordinate_frame != INSTRUMENT_FRAME):
+            raise ValueError('Bad coord frame: expected = %s or %s, actual = %s' % 
+                             (EARTH_FRAME, INSTRUMENT_FRAME, coordinate_frame))
 
         # assume zero angle of attack
         self.set_data('angle_of_attack', 0)

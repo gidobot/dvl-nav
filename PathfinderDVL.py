@@ -3,6 +3,7 @@
 # Superclass for Pathfinder DVL data 
 #   2020-05-05  zduguid@mit.edu         initial implementation
 #   2021-08-23  gburgess@mit.edu        Removed BIAS_PITCH for unit 250 and added unit 270 BIASES
+#   2022-03-07  gburgess@mit.edu        Changed num_bins to 20
 
 import numpy as np
 
@@ -29,7 +30,7 @@ class PathfinderDVL(object):
         #     array processing and ensemble storage. 
         self.NUM_BEAMS_EXP = 4       # expected number of DVL beams  
         #TODO Current unit770 explorer dvl set to 20 bins. 40 for kolumbo
-        self.NUM_BINS_EXP  = 40      # expected number of bins (or cells)
+        self.NUM_BINS_EXP  = 20      # expected number of bins (or cells)
         self.BAD_VELOCITY  = -32768  # value that represents invalid velocity 
         self.BAD_BT_RANGE  = 0       # value that represents invalid range
         self.MAX_ENS_NUM   = 65536   # max number of ensembles before rollover
