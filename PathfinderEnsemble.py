@@ -461,7 +461,7 @@ class PathfinderEnsemble(PathfinderDVL):
         MAX_SPEED   = 1.3 
 
         coordinate_frame = self.parse_coordinate_transformation(verbose=False)
-        if (coordinate_frame != EARTH_FRAME) or (coordinate_frame != INSTRUMENT_FRAME):
+        if (coordinate_frame != EARTH_FRAME) and (coordinate_frame != INSTRUMENT_FRAME):
             raise ValueError('Bad coord frame: expected = %s or %s, actual = %s' % 
                              (EARTH_FRAME, INSTRUMENT_FRAME, coordinate_frame))
 
