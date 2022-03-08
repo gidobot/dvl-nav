@@ -37,7 +37,6 @@ class SlocumFlightController(object):
             'm_depth_rate',
             'm_water_depth',
             'm_pressure',
-            'm_altitude',
             'm_battery',
             'm_vacuum',
             'm_ballast_pumped',
@@ -45,6 +44,10 @@ class SlocumFlightController(object):
             'm_battpos',
             'm_thruster_power',
             'm_thruster_current',
+            'm_altitude',
+            'm_raw_altitude',
+            'm_altimeter_voltage',
+            'm_raw_altitude_rejected',
             
             # Controller Variables 
             'c_pitch',
