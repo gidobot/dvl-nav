@@ -48,6 +48,22 @@ class SlocumFlightController(object):
             'm_raw_altitude',
             'm_altimeter_voltage',
             'm_raw_altitude_rejected',
+            'u_alt_min_post_inflection_time',
+            'u_alt_reqd_good_in_a_row',
+            'u_alt_filter_enabled',
+
+            # PAR Sensor
+            'sci_bsipar_par',  #[uE/m^2sec]
+            'sci_bsipar_sensor_volts', #col1
+            'sci_bsipar_temp', #col2
+            'sci_bsipar_supply_volts', #col3
+            'sci_bsipar_timestamp', 
+
+            # CTD Sensor
+            'sci_water_cond',  # [S/m]
+            'sci_water_temp',  # [deg C]
+            'sci_water_pressure', # [bar]
+            'sci_ctd41cp_timestamp',
             
             # Controller Variables 
             'c_pitch',
