@@ -2,8 +2,9 @@
 #
 # Superclass for Pathfinder DVL data 
 #   2020-05-05  zduguid@mit.edu         initial implementation
-#   2021-08-23  gburgess@mit.edu        Removed BIAS_PITCH for unit 250 and added unit 270 BIASES
-#   2022-03-07  gburgess@mit.edu        Changed num_bins to 20
+#   2021-08-23  gburgess@mit.edu        Removed BIAS_PITCH for unit 250 and added unit 770 BIASES
+#   2022-03-07  gburgess@mit.edu        Changed num_bins to 20 and switched to unit 770 biases
+#   2022-03-08  gburgess@mit.edu        added external sensor derived variables
 
 import numpy as np
 
@@ -38,14 +39,14 @@ class PathfinderDVL(object):
         # mounting bias parameters 
 
         #Unit 770
-        # self.BIAS_PITCH   =  0.0  # [deg]
-        # self.BIAS_ROLL    =  0.0  # [deg]
-        # self.BIAS_HEADING =  0.0  # [deg]
-
-        #Unit 250
-        self.BIAS_PITCH   = 12.5  # [deg]
+        self.BIAS_PITCH   =  0.0  # [deg]
         self.BIAS_ROLL    =  0.0  # [deg]
         self.BIAS_HEADING =  0.0  # [deg]
+
+        #Unit 250
+        # self.BIAS_PITCH   = 12.5  # [deg]
+        # self.BIAS_ROLL    =  0.0  # [deg]
+        # self.BIAS_HEADING =  0.0  # [deg]
 
         # self.BIAS_PITCH   =  8.0  # [deg]
         # self.BIAS_ROLL    =  0.0  # [deg]
@@ -117,6 +118,15 @@ class PathfinderDVL(object):
             'bathy_factor_depth',
             'bathy_factor_slope', 
             'bathy_factor_orient',
+
+            # external inputs (unit 770 implementation)
+            'ros_timestamp',
+            'ahrs_roll',
+            'ahrs_pitch',
+            'ahrs_heading',
+            'ctd_depth',
+            'ctd_temp',
+            'ctd_cond'
         )
 
         # tuple of variables that are automatically reported by Pathfinder
