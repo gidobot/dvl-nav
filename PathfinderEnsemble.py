@@ -7,6 +7,9 @@
 #   2020-05-05  zduguid@mit.edu         reorganized code with DVL superclass 
 #   2022-03-07  gburgess@mit.edu        suppport for instrument frame in derived variables
 #   2022-03-08  gburgess@mit.edu        external sensors, re-calculate rel_vel_pressure
+#   2022-03-09  gburgess@mit.edu        rotate water track and btm track velocities into earth frame
+#                                       commented out apply_mounting_biases -- rolled into instr_to_earth 
+#                                       function
 
 import numpy as np 
 import pandas as pd
@@ -498,7 +501,8 @@ class PathfinderEnsemble(PathfinderDVL):
         u0    = self.get_data(label_u)
         v0    = self.get_data(label_v) 
         w0    = self.get_data(label_w)
-        u,v,w = self.apply_mounting_bias_rotations((u0,v0,w0))
+        #u,v,w = self.apply_mounting_bias_rotations((u0,v0,w0))
+        u,v,w = self.apply_instr_to_earth((u0,v0,w0))
         self.set_data(label_u, u)
         self.set_data(label_v, v)
         self.set_data(label_w, w)
@@ -571,7 +575,6 @@ class PathfinderEnsemble(PathfinderDVL):
         prev_pitch     = self.prev_ensemble.get_data('pitch')
         prev_t         = self.prev_ensemble.get_data('time') 
 
-        #TODO rotate into nav frame
         # helper function for setting DVL velocity based on bin number
         def set_dvl_rel_velocities(bin_num):
             u_var = self.get_profile_var_name('velocity', bin_num, 0)
@@ -581,12 +584,12 @@ class PathfinderEnsemble(PathfinderDVL):
             self.set_data('rel_vel_dvl_v', -self.get_data(v_var))
             self.set_data('rel_vel_dvl_w',  self.get_data(w_var))
 
-        #TODO rotate into nav frame
         # helper function for setting bottom track velocities
         def set_btm_abs_velocities():
             self.set_data('abs_vel_btm_u', -self.btm_beam0_velocity)
             self.set_data('abs_vel_btm_v', -self.btm_beam1_velocity)
             self.set_data('abs_vel_btm_w',  self.btm_beam2_velocity)
+
     
         # helper function to update relative position 
         def update_position(vel_label):
@@ -761,7 +764,22 @@ class PathfinderEnsemble(PathfinderDVL):
         u,v,w             = V_earth.flatten()
         return(u,v,w)
 
+    def apply_instr_to_earth(self, velocity0):
+        u0,v0,w0       = velocity0
+        V_inst         = np.array([[u0], [v0], [w0]])
+        
+        # rotate velocities from instrument Coords <u, v, w> to Earth Coords <E, N, U>
+        heading = self.ext_heading + self.BIAS_HEADING
+        roll    = self.ext_roll + self.BIAS_ROLL
+        pitch   = self.ext_pitch + self.BIAS_PITCH
 
+        R1      = np.dot(self.Qz(heading),self.Qy(pitch))
+        R2      = np.dot(R1, self.Qx(roll))
+        V_earth = np.dot(V_inst, R2)
+        u,v,w   = V_earth.flatten() 
+        return(u,v,w)
+
+    #TODO Review roatations
     def get_bathy_factors(self):
         """Computes three factors of bathymetry: depth, slope, & orientation"""
         # convert bottom-track vertical range to slant range
@@ -881,7 +899,8 @@ class PathfinderEnsemble(PathfinderDVL):
 
                 # rotate velocity vector to account for pitch bias
                 if velocity0:
-                    u,v,w  = self.apply_mounting_bias_rotations(velocity0)
+                    #u,v,w  = self.apply_mounting_bias_rotations(velocity0)
+                    u,v,w  = self.apply_instr_to_earth(velocity0)
                     xlabel = self.get_profile_var_name(var_name,bin_num,beam_u)
                     ylabel = self.get_profile_var_name(var_name,bin_num,beam_v)
                     zlabel = self.get_profile_var_name(var_name,bin_num,beam_w)
