@@ -515,7 +515,7 @@ class PathfinderEnsemble(PathfinderDVL):
         """
 
         # using external sensors
-        EXT_SENSORS = True
+        EXT_SENSORS = False
 
         # check that the DVL is reporting data in earth coordinates
         #EARTH_FRAME = 'Instrument Coords'
@@ -571,9 +571,14 @@ class PathfinderEnsemble(PathfinderDVL):
         prev_rel_pos_x = self.prev_ensemble.get_data('rel_pos_x_dvl_dr')
         prev_rel_pos_y = self.prev_ensemble.get_data('rel_pos_y_dvl_dr')
         prev_rel_pos_z = self.prev_ensemble.get_data('rel_pos_z_dvl_dr')
-        prev_depth     = self.prev_ensemble.get_data('depth')
-        prev_pitch     = self.prev_ensemble.get_data('pitch')
-        prev_t         = self.prev_ensemble.get_data('time') 
+        if EXT_SENSORS:
+            prev_depth     = self.prev_ensemble.get_data('ctd_depth')
+            prev_pitch     = self.prev_ensemble.get_data('ahrs_pitch')
+            prev_t         = self.prev_ensemble.get_data('ros_timestamp') 
+        else:
+            prev_depth     = self.prev_ensemble.get_data('depth')
+            prev_pitch     = self.prev_ensemble.get_data('pitch')
+            prev_t         = self.prev_ensemble.get_data('time') 
 
         # helper function for setting DVL velocity based on bin number
         def set_dvl_rel_velocities(bin_num):
@@ -642,7 +647,7 @@ class PathfinderEnsemble(PathfinderDVL):
 
             # horizontal velocity depends on pitch value
             rel_vel_h = self.rel_vel_pressure_w / \
-                        np.tan(-self.pitch*self.DEG_TO_RAD)
+                        np.tan(current_pitch*self.DEG_TO_RAD)
 
             rel_vel_u = rel_vel_h*np.sin(current_heading*self.DEG_TO_RAD)
             rel_vel_v = rel_vel_h*np.cos(current_heading*self.DEG_TO_RAD)
@@ -769,14 +774,22 @@ class PathfinderEnsemble(PathfinderDVL):
         V_inst         = np.array([[u0], [v0], [w0]])
         
         # rotate velocities from instrument Coords <u, v, w> to Earth Coords <E, N, U>
-        heading = self.ext_heading + self.BIAS_HEADING
-        roll    = self.ext_roll + self.BIAS_ROLL
-        pitch   = self.ext_pitch + self.BIAS_PITCH
+        heading = (self.ext_heading + self.BIAS_HEADING) * self.DEG_TO_RAD
+        roll    = (self.ext_roll + self.BIAS_ROLL) * self.DEG_TO_RAD
+        pitch   = (self.ext_pitch + self.BIAS_PITCH) * self.DEG_TO_RAD
 
-        R1      = np.dot(self.Qz(heading),self.Qy(pitch))
-        R2      = np.dot(R1, self.Qx(roll))
-        V_earth = np.dot(V_inst, R2)
-        u,v,w   = V_earth.flatten() 
+        # R1      = np.dot(self.Qz(heading),self.Qy(pitch))
+        # R2      = np.dot(R1, self.Qx(roll))
+        # V_earth = np.dot(R2,V_inst)
+        # u,v,w   = V_earth.flatten() 
+        # return(u,v,w)
+        Qx = self.Qx(pitch)
+        Qy = self.Qy(roll)
+        Qz = self.Qz(heading)
+        R1 = np.dot(Qx, V_inst)
+        R2 = np.dot(Qy, R1)
+        V_earth = np.dot(Qz, R2)
+        u,v,w = V_earth.flatten()
         return(u,v,w)
 
     #TODO Review roatations
