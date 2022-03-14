@@ -783,13 +783,15 @@ class PathfinderEnsemble(PathfinderDVL):
         # V_earth = np.dot(R2,V_inst)
         # u,v,w   = V_earth.flatten() 
         # return(u,v,w)
+
         Qx = self.Qx(pitch)
         Qy = self.Qy(roll)
-        Qz = self.Qz(heading)
+        Qz = self.Qz(-heading)
         R1 = np.dot(Qx, V_inst)
         R2 = np.dot(Qy, R1)
         V_earth = np.dot(Qz, R2)
         u,v,w = V_earth.flatten()
+
         return(u,v,w)
 
     #TODO Review roatations
