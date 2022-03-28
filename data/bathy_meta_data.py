@@ -44,15 +44,15 @@ BathyData = {
     'Puerto_Rico' : {
         'filepath'  : "/home/gburgess/dvl-nav/data/field_data/puerto_rico/bathy/PuertoRico_SouthWest.tif",
         'latlon_format' : True,
-        #'crop'  : None,
-        'crop'  : [1500, 1600, 1000, 1100,],
-        #'crop'  : [1500, 7500, 1000, 12500],
-        # crop  = [top, bot, left, right]
+        # 'crop'  : None,
+        'crop'  : [700, 5500, 3500, 8500,],
+        # 'crop'  : [3500, 4500, 1500, 3500],
         # bathy = bathy_im[top:bot, left:right]
         'name' : 'Puerto Rico',
         'xlabel': 'Longitude [deg]',
         'ylabel': 'Latitude [deg]',
         'tick_format' : '%.2f',
+        # 'num_ticks' : None,
         'num_ticks' : 3,
         'slope_max' : None,
         'depth_max' : None,

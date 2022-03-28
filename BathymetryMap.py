@@ -329,8 +329,8 @@ class BathymetryMap(object):
         # generate plot
         self.make_surface_plot(ax, depth, "Depth [m]", "viridis_r", 
             add_xlabel, add_ylabel)
-        if save_plot:
-            plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
+        #if save_plot:
+        #    plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
 
 
     def plot_slope_map(self, ax=None, add_xlabel=True, add_ylabel=True):
@@ -352,8 +352,8 @@ class BathymetryMap(object):
         # generate plot
         self.make_surface_plot(ax, slope, "Slope [deg]", "inferno_r",
             add_xlabel, add_ylabel)
-        if save_plot:
-            plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
+        #if save_plot:
+        #    plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
 
 
     def plot_orientation_map(self, ax=None, add_xlabel=True, add_ylabel=True):
@@ -370,8 +370,8 @@ class BathymetryMap(object):
         # generate plot
         self.make_surface_plot(ax, self.orient, "Orientation [deg]", 
             "twilight_shifted", add_xlabel, add_ylabel)
-        if save_plot:
-            plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
+        #if save_plot:
+        #    plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
 
 
     def plot_three_factors(self):
@@ -397,7 +397,7 @@ class BathymetryMap(object):
         ax[1,0].set_xlabel('Depth [m]')
         ax[1,1].set_xlabel('Slope [deg]')
         ax[1,2].set_xlabel('Orientation [deg]')
-        plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
+        #plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
 
 
     def plot_depth_contours(self, ax=None):
@@ -427,4 +427,4 @@ class BathymetryMap(object):
         plt.gca().invert_yaxis()
         self.set_ticks_and_tick_labels(ax)
         plt.axis('equal')
-        plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
+        #plt.savefig('/Users/zduguid/Desktop/fig/tmp.png')
