@@ -5,6 +5,7 @@
 #   2021-08-23  gburgess@mit.edu        Removed BIAS_PITCH for unit 250 and added unit 770 BIASES
 #   2022-03-07  gburgess@mit.edu        Changed num_bins to 20 and switched to unit 770 biases
 #   2022-03-08  gburgess@mit.edu        added external sensor derived variables
+#   2022-04-06  gburgess@mit.edu        added more position vars for utm and lat/lon
 
 import numpy as np
 
@@ -109,6 +110,12 @@ class PathfinderDVL(object):
             'rel_pos_z_dvl_dr',
             'origin_x',
             'origin_y',
+
+            # positions for utm and lat/lon
+            'rel_pos_x_utm',
+            'rel_pos_y_utm',
+            'rel_pos_lon',
+            'rel_pos_lat',
             
             # miscellaneous
             'angle_of_attack',
