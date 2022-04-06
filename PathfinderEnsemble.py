@@ -514,21 +514,24 @@ class PathfinderEnsemble(PathfinderDVL):
         Uses information from other variables 
         """
 
-        # using external sensors
-        EXT_SENSORS = False
-
-        # check that the DVL is reporting data in earth coordinates
-        #EARTH_FRAME = 'Instrument Coords'
+        # check that the DVL is reporting data in earth coordinates or instrument coords
         INSTRUMENT_FRAME = 'Instrument Coords'
         EARTH_FRAME = 'Earth Coords'
-        MIN_PITCH   = 0.001
+        # MIN_PITCH   = 0.001
+        MIN_PITCH   = 1.0
         EPSILON     = 0.001
-        MAX_SPEED   = 1.3 
+        MAX_SPEED   = 2.5 
 
         coordinate_frame = self.parse_coordinate_transformation(verbose=False)
         if (coordinate_frame != EARTH_FRAME) and (coordinate_frame != INSTRUMENT_FRAME):
             raise ValueError('Bad coord frame: expected = %s or %s, actual = %s' % 
                              (EARTH_FRAME, INSTRUMENT_FRAME, coordinate_frame))
+
+        # Assumes use of external sensors if using Instrument frame
+        if coordinate_frame == INSTRUMENT_FRAME:
+            EXT_SENSORS = True
+        elif coordinate_frame == EARTH_FRAME:
+            EXT_SENSORS = False
 
         # External Sensors
         if self.ros_time:
@@ -620,7 +623,6 @@ class PathfinderEnsemble(PathfinderDVL):
 
 
         # compute through water velocity from pressure method
-        
 
         if EXT_SENSORS:
             self.set_data('delta_t',          self.ros_time  - prev_t)
@@ -647,12 +649,16 @@ class PathfinderEnsemble(PathfinderDVL):
 
             # horizontal velocity depends on pitch value
             rel_vel_h = self.rel_vel_pressure_w / \
-                        np.tan(current_pitch*self.DEG_TO_RAD)
+                        np.tan(-current_pitch*self.DEG_TO_RAD)
 
             rel_vel_u = rel_vel_h*np.sin(current_heading*self.DEG_TO_RAD)
             rel_vel_v = rel_vel_h*np.cos(current_heading*self.DEG_TO_RAD)
-            self.set_data('rel_vel_pressure_u', rel_vel_u)
-            self.set_data('rel_vel_pressure_v', rel_vel_v)
+            if ((np.abs(rel_vel_u) < MAX_SPEED) and (np.abs(rel_vel_v) < MAX_SPEED)):
+                self.set_data('rel_vel_pressure_u', rel_vel_u)
+                self.set_data('rel_vel_pressure_v', rel_vel_v)
+            else:
+                self.set_data('rel_vel_pressure_u', np.NaN)
+                self.set_data('rel_vel_pressure_v', np.NaN)
 
         # set pressure through water velocities to NaN otherwise
         else:
