@@ -93,7 +93,7 @@ class BathymetryMap(object):
             self.y_res     = dem.res[1]
 
         # filter out no data values and values above sea level 
-        self.bathy[self.bathy>0] = np.NaN
+        # self.bathy[self.bathy>0] = np.NaN
         self.bathy[self.bathy==self.nodata] = np.NaN
 
         # filter out depth filter
@@ -191,6 +191,9 @@ class BathymetryMap(object):
 
     def fix_crop(self):
         """TODO
+        make more robust for both positive and negative longitudes.
+        currently will only work for negative longitudes because when 
+        setting new right and left limits, it multiplies by negative 1
         """
         # crop values are given by array indices not physical coordinates
         y1, y2, x1, x2 = self.crop
@@ -198,45 +201,58 @@ class BathymetryMap(object):
         y2 = min(y2, self.bathy.shape[0])
         x1 = max(x1, 0)
         x2 = min(x2, self.bathy.shape[1])
-
+        print(y1, y2, x1, x2)
         # crop the bathymetry array
         # TODO
-        # print(self.bathy.shape)
+        print('Old Shape: ', self.bathy.shape)
         self.bathy = np.copy(self.bathy[y1:y2, x1:x2])
 
         # extract bounds (units of bathymetry file, [wgs84] or [utm])
         old_left, old_right  = self.left, self.right
         old_top,  old_bottom = self.top,  self.bottom
-
+        
         # extract original size of array  
         old_width            = self.width 
         old_height           = self.height 
 
-        # TODO
-        # print(self.bathy.shape)
-        # print(old_width, old_height)
-        # print(y1/old_height, y2/old_height)
+        # calculate actual range 
         range_x              = old_right  - old_left
         range_y              = old_top    - old_bottom
+
+        # calculate resolution dist/ 'idx'
+        x_res                = range_x/old_width
+        y_res                = range_y/old_height
 
         # compute new width, height, and bounds
         self.width  = x2 - x1
         self.height = y2 - y1 
-        self.left   = old_left   + (x1/old_width)  * range_x
-        self.right  = old_left   + (x2/old_width)  * range_x
-        self.top    = old_bottom + (y2/old_height) * range_y
-        self.bottom = old_bottom + (y1/old_height) * range_y
+        self.top    = ((old_height - y1) * y_res) + old_bottom
+        self.bottom = ((old_height - y2) * y_res) + old_bottom
+        self.right  = ((old_width - x2) * x_res) * -1 + old_right
+        self.left   = ((old_width - x1) * x_res) * -1 + old_right
+        # TODO
+        print('New Shape: ', self.bathy.shape)
+        print('Old Width: ', old_width, ' ', 'Old Height: ', old_height)
+        print(y1/old_height, y2/old_height)
+
+        # compute new width, height, and bounds
+        
+        # self.left   = old_left   + (x1/old_width)  * range_x
+        # self.right  = old_left   + (x2/old_width)  * range_x
+        # self.top    = old_bottom + (y2/old_height) * range_y
+        # self.bottom = old_bottom + (y1/old_height) * range_y
+
 
         # TODO
-        # print(self.crop)
-        # print()
-        # print("left:   %0.3f --> %0.3f" % (old_left, self.left))
-        # print("right:  %0.3f --> %0.3f" % (old_right, self.right))
-        # print("bottom: %0.3f --> %0.3f" % (old_bottom, self.bottom))
-        # print("top:    %0.3f --> %0.3f" % (old_top, self.top))
-        # print()
-        # print(range_y, range_x)
-        # print(old_height, old_width )
+        print(self.crop)
+        print()
+        print("left:   %0.3f --> %0.3f" % (old_left, self.left))
+        print("right:  %0.3f --> %0.3f" % (old_right, self.right))
+        print("bottom: %0.3f --> %0.3f" % (old_bottom, self.bottom))
+        print("top:    %0.3f --> %0.3f" % (old_top, self.top))
+        print()
+        print(range_y, range_x)
+        print(old_height, old_width )
 
 
     @classmethod
