@@ -513,8 +513,7 @@ def plot_profile_and_odometry_and_dr(ts_pd0, df_dbd, save_name=None):
 ###############################################################################
 # PLOT PROFILE AND ODOMETRY AND DEAD-RECKONED
 ###############################################################################
-#TODO
-def plot_profile_and_navigation(ts_pd0, ts_dbd_all, save_name=None):
+def plot_profile_and_navigation(ts_pd0, df_dbd, save_name=None):
     sns.set(font_scale = 1.5)
     fig, ax = plt.subplots(1,2, figsize=(15,8))
 
@@ -523,7 +522,7 @@ def plot_profile_and_navigation(ts_pd0, ts_dbd_all, save_name=None):
     #############################################
     linewidth=8
     sns.scatterplot(
-        ts_pd0.df.time, 
+        ts_pd0.df.ros_timestamp, 
         -ts_pd0.df.ctd_depth, 
         ax=ax[0], 
         linewidth=0,  
@@ -532,7 +531,7 @@ def plot_profile_and_navigation(ts_pd0, ts_dbd_all, save_name=None):
         color='tab:orange',
     )
     sns.scatterplot(
-        ts_pd0.df.time, 
+        ts_pd0.df.ros_timestamp, 
         -ts_pd0.df.pc_bathy_depth,           
         ax=ax[0], 
         linewidth=0,
@@ -545,12 +544,6 @@ def plot_profile_and_navigation(ts_pd0, ts_dbd_all, save_name=None):
     #############################################
     # PLOT ODOMETRY AND DEAD-RECKONED ###########
     #############################################
-    # sub-select a portion of glider flight computer variables
-    start_t = datetime.datetime.fromtimestamp(ts_pd0.df.time[0])
-    end_t   = datetime.datetime.fromtimestamp(ts_pd0.df.time[-1])
-    dur     = end_t - start_t 
-    df_dbd  = ts_dbd_all.df[str(start_t):str(end_t)].copy()
-
     # extract start_t position "origin" from the glider flight data 
     for t in range(len(df_dbd)):
         if not np.isnan(df_dbd.m_x_lmc[t]):
@@ -634,7 +627,7 @@ def plot_profile_and_navigation(ts_pd0, ts_dbd_all, save_name=None):
 ###############################################################################
 # PLOT PROFILE AND ODOMETRY AND DEAD-RECKONED AND THREE-FACTORS
 ###############################################################################
-def plot_profile_and_odometry_and_dr_and_three_factors(ts_pd0, ts_dbd_all,
+def plot_profile_and_odometry_and_dr_and_three_factors(ts_pd0, df_dbd,
     bathy_df, save_name=None):
     sns.set(font_scale = 1.5)
     fig, ax = plt.subplots(figsize=(15,15))
@@ -646,9 +639,9 @@ def plot_profile_and_odometry_and_dr_and_three_factors(ts_pd0, ts_dbd_all,
         SECS_IN_MIN = 60
         MIN_OFFSET = 100
         lat_min  = m_lat % MIN_OFFSET 
-        lon_min  = m_lon % MIN_OFFSET 
+        lon_min  = np.abs(m_lon) % MIN_OFFSET 
         lat_dec  = (m_lat - lat_min)/MIN_OFFSET + lat_min/SECS_IN_MIN
-        lon_dec  = (m_lon - lon_min)/MIN_OFFSET + lon_min/SECS_IN_MIN
+        lon_dec  = (m_lon + lon_min)/MIN_OFFSET - lon_min/SECS_IN_MIN
         utm_pos  = utm.from_latlon(lat_dec, lon_dec)
         easting  = round(utm_pos[0],2)
         northing = round(utm_pos[1],2)
@@ -669,13 +662,13 @@ def plot_profile_and_odometry_and_dr_and_three_factors(ts_pd0, ts_dbd_all,
 
     factor_d = -ts_pd0.df.pc_bathy_depth
     factor_s =  ts_pd0.df.pc_bathy_slope
-    factor_o =  ts_pd0.df.pc_bathy_orient 
+    factor_o =  ts_pd0.df.pc_bathy_orient
 
-    sns.scatterplot(ts_pd0.df.time, factor_d, ax=ax0, s=marker_size, 
+    sns.scatterplot(ts_pd0.df.ros_timestamp, factor_d, ax=ax0, s=marker_size, 
         linewidth=0, color='tab:blue', zorder=3)
-    sns.scatterplot(ts_pd0.df.time, factor_s,  ax=ax1, s=marker_size, 
+    sns.scatterplot(ts_pd0.df.ros_timestamp, factor_s,  ax=ax1, s=marker_size, 
         linewidth=0, color='tab:purple')
-    sns.scatterplot(ts_pd0.df.time, factor_o, ax=ax2, s=marker_size,
+    sns.scatterplot(ts_pd0.df.ros_timestamp, factor_o, ax=ax2, s=marker_size,
         linewidth=0, color='tab:red')
 
     ticks  = ax0.get_xticks()
@@ -694,8 +687,8 @@ def plot_profile_and_odometry_and_dr_and_three_factors(ts_pd0, ts_dbd_all,
     xlim0 = ax0.get_xlim()
 
     # set axis limits so legends will fit
-    max_altitude = np.nanmax(ts_pd0.df.bathy_factor_depth)
-    max_slope    = np.nanmax(ts_pd0.df.bathy_factor_slope)
+    max_altitude = np.nanmax(ts_pd0.df.pc_bathy_depth)
+    max_slope    = np.nanmax(ts_pd0.df.pc_bathy_slope)
     ax1.set_xlim(xlim0)
     ax2.set_xlim(xlim0)
     ax0.set_ylim([-max_altitude*1.05, max_altitude*0.2])
@@ -714,13 +707,6 @@ def plot_profile_and_odometry_and_dr_and_three_factors(ts_pd0, ts_dbd_all,
     #############################################
     # PLOT ODOMETRY AND DEAD-RECKONED ###########
     #############################################
-
-    # sub-select a portion of glider flight computer variables
-    start_t = datetime.datetime.fromtimestamp(ts_pd0.df.time[0])
-    end_t   = datetime.datetime.fromtimestamp(ts_pd0.df.time[-1])
-    dur     = end_t - start_t 
-    df_dbd  = ts_dbd_all.df[str(start_t):str(end_t)].copy()
-
     # extract start_t position "origin" from the glider flight data 
     for t in range(len(df_dbd)):
         if not np.isnan(df_dbd.m_x_lmc[t]):
@@ -746,7 +732,7 @@ def plot_profile_and_odometry_and_dr_and_three_factors(ts_pd0, ts_dbd_all,
     tmp_depth[tmp_depth > depth_filter] = depth_filter
 
     nav_axs      = [ax3, ax4, ax5]
-    nav_palletes = ['Blues', 'Purples', 'twilight_shifted']
+    nav_palletes = ['icefire', 'Purples', 'twilight_shifted']
     nav_hues     = [tmp_depth, tmp_slope, bathy_df.orient_list] 
     nav_xlims    = []
     nav_ylims    = []
@@ -837,7 +823,7 @@ def plot_profile_and_odometry_and_dr_and_three_factors(ts_pd0, ts_dbd_all,
 ###############################################################################
 # PLOT PROFILE AND ODOMETRY AND DEAD-RECKONED AND SLOPE FACTOR
 ###############################################################################
-def plot_profile_and_odometry_and_dr_and_slope_factor(ts_pd0, ts_dbd_all,
+def plot_profile_and_odometry_and_dr_and_slope_factor(ts_pd0, df_dbd,
     bathy_df, save_name=None):
     sns.set(font_scale = 1.5)
     fig, ax = plt.subplots(1,2, figsize=(15,8))
@@ -849,9 +835,9 @@ def plot_profile_and_odometry_and_dr_and_slope_factor(ts_pd0, ts_dbd_all,
         SECS_IN_MIN = 60
         MIN_OFFSET = 100
         lat_min  = m_lat % MIN_OFFSET 
-        lon_min  = m_lon % MIN_OFFSET 
+        lon_min  = np.abs(m_lon) % MIN_OFFSET 
         lat_dec  = (m_lat - lat_min)/MIN_OFFSET + lat_min/SECS_IN_MIN
-        lon_dec  = (m_lon - lon_min)/MIN_OFFSET + lon_min/SECS_IN_MIN
+        lon_dec  = (m_lon + lon_min)/MIN_OFFSET - lon_min/SECS_IN_MIN
         utm_pos  = utm.from_latlon(lat_dec, lon_dec)
         easting  = round(utm_pos[0],2)
         northing = round(utm_pos[1],2)
@@ -861,7 +847,7 @@ def plot_profile_and_odometry_and_dr_and_slope_factor(ts_pd0, ts_dbd_all,
     #############################################
     # PLOT PROFILE ##############################
     #############################################
-    depth = -1 * ts_pd0.df['ahrs_depth']
+    depth = -1 * ts_pd0.df['ctd_depth']
     line_plot = depth.plot(figsize=(15,8), linewidth=3, color='tab:orange', ax=ax[0])
 
     # compute altitude estimate from the four vertical range estimates
@@ -893,12 +879,6 @@ def plot_profile_and_odometry_and_dr_and_slope_factor(ts_pd0, ts_dbd_all,
     #############################################
     # PLOT ODOMETRY AND DEAD-RECKONED ###########
     #############################################
-    # sub-select a portion of glider flight computer variables
-    start_t = datetime.datetime.fromtimestamp(ts_pd0.df.time[0])
-    end_t   = datetime.datetime.fromtimestamp(ts_pd0.df.time[-1])
-    dur     = end_t - start_t 
-    df_dbd  = ts_dbd_all.df[str(start_t):str(end_t)].copy()
-
     # extract start_t position "origin" from the glider flight data 
     for t in range(len(df_dbd)):
         if not np.isnan(df_dbd.m_x_lmc[t]):
@@ -947,7 +927,7 @@ def plot_profile_and_odometry_and_dr_and_slope_factor(ts_pd0, ts_dbd_all,
     )
 
     # TODO temp plotting helper 
-    pitch_threshold = 30
+    pitch_threshold = 45
     tmp_slope_list = np.array(bathy_df.slope_list)
     tmp_slope_list[tmp_slope_list >= pitch_threshold] = pitch_threshold
 
@@ -959,7 +939,9 @@ def plot_profile_and_odometry_and_dr_and_slope_factor(ts_pd0, ts_dbd_all,
         bathy_df.utm_y_list - dbd_utm_y,
         tmp_slope_list,
         marker='s',
-        palette='Purples',
+        # palette='Purples',
+        palette='gray_r',
+        s=200,
         linewidth=0,
         ax=ax[1],
         zorder=0,
@@ -981,16 +963,15 @@ def plot_profile_and_odometry_and_dr_and_slope_factor(ts_pd0, ts_dbd_all,
     plt.xlabel('X position [m]')
     plt.ylabel('Y position [m]')
     plt.subplots_adjust(wspace=0.3)
-    if save_name: plt.savefig('/Users/zduguid/Desktop/fig/%s' % save_name)
+    if save_name: plt.savefig(save_name)
     else:         plt.savefig(filepath + 'tmp.png')
-    plt.close()
 
 
 ###############################################################################
 # PLOT PROFILE AND ODOMETRY AND DEAD-RECKONED AND BATHYMETRY
 ###############################################################################
-def plot_profile_and_odometry_and_dr_and_bathymetry(ts_pd0, ts_dbd_all, 
-    bathy_df, save_name=None):
+def plot_profile_and_odometry_and_dr_and_bathymetry(ts_pd0, df_dbd, 
+    bathy_df, max_depth=30, save_name=None):
     sns.set(font_scale = 1.5)
     fig, ax = plt.subplots(1,2, figsize=(15,8))
 
@@ -1001,9 +982,9 @@ def plot_profile_and_odometry_and_dr_and_bathymetry(ts_pd0, ts_dbd_all,
         SECS_IN_MIN = 60
         MIN_OFFSET = 100
         lat_min  = m_lat % MIN_OFFSET 
-        lon_min  = m_lon % MIN_OFFSET 
+        lon_min  = np.abs(m_lon) % MIN_OFFSET 
         lat_dec  = (m_lat - lat_min)/MIN_OFFSET + lat_min/SECS_IN_MIN
-        lon_dec  = (m_lon - lon_min)/MIN_OFFSET + lon_min/SECS_IN_MIN
+        lon_dec  = (m_lon + lon_min)/MIN_OFFSET - lon_min/SECS_IN_MIN
         utm_pos  = utm.from_latlon(lat_dec, lon_dec)
         easting  = round(utm_pos[0],2)
         northing = round(utm_pos[1],2)
@@ -1014,7 +995,7 @@ def plot_profile_and_odometry_and_dr_and_bathymetry(ts_pd0, ts_dbd_all,
     #############################################
     # PLOT PROFILE ##############################
     #############################################
-    depth = -1 * ts_pd0.df['ahrs_depth']
+    depth = -1 * ts_pd0.df['ctd_depth']
     line_plot = depth.plot(figsize=(15,8), linewidth=3, color='tab:orange', 
         ax=ax[0])
 
@@ -1047,12 +1028,6 @@ def plot_profile_and_odometry_and_dr_and_bathymetry(ts_pd0, ts_dbd_all,
     #############################################
     # PLOT ODOMETRY AND DEAD-RECKONED ###########
     #############################################
-    # sub-select a portion of glider flight computer variables
-    start_t = datetime.datetime.fromtimestamp(ts_pd0.df.time[0])
-    end_t   = datetime.datetime.fromtimestamp(ts_pd0.df.time[-1])
-    dur     = end_t - start_t 
-    df_dbd  = ts_dbd_all.df[str(start_t):str(end_t)].copy()
-
     # extract start_t position "origin" from the glider flight data 
     for t in range(len(df_dbd)):
         if not np.isnan(df_dbd.m_x_lmc[t]):
@@ -1104,7 +1079,7 @@ def plot_profile_and_odometry_and_dr_and_bathymetry(ts_pd0, ts_dbd_all,
     x_lim = ax[1].get_xlim()
     y_lim = ax[1].get_ylim()
     tmp_depth = bathy_df.depth_list.copy()
-    tmp_depth[tmp_depth>300] = 300
+    tmp_depth[tmp_depth>max_depth] = max_depth
     sns.scatterplot(
         bathy_df.utm_x_list - dbd_utm_x,
         bathy_df.utm_y_list - dbd_utm_y,
@@ -1137,9 +1112,8 @@ def plot_profile_and_odometry_and_dr_and_bathymetry(ts_pd0, ts_dbd_all,
     plt.xlabel('X position [m]')
     plt.ylabel('Y position [m]')
     plt.subplots_adjust(wspace=0.3)
-    if save_name: plt.savefig('/Users/zduguid/Desktop/fig/%s' % save_name)
+    if save_name: plt.savefig(save_name)
     else:         plt.savefig(filepath + 'tmp.png')
-    plt.close()
 
 
 ###############################################################################
@@ -1517,7 +1491,6 @@ def plot_velocity_northward(ts, glider, save_name=None, roll_size=10,
     plt.title('%s Puerto Rico %s' % (unit_name[glider], dt.isoformat(),))
     plt.xlabel('Time')
     plt.ylabel('Velocity [m/s]')
-    plt.savefig(filepath + 'tmp.png')
     if save_name: plt.savefig(save_name)
     else:         plt.savefig(filepath + 'tmp.png')
 
