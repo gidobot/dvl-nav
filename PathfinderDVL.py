@@ -126,6 +126,11 @@ class PathfinderDVL(object):
             'bathy_factor_slope', 
             'bathy_factor_orient',
 
+            # seafloor information calculated via point cloud method
+            'pc_bathy_depth',
+            'pc_bathy_slope',
+            'pc_bathy_orient',
+
             # external inputs (unit 770 implementation)
             'ros_timestamp',
             'ahrs_roll',

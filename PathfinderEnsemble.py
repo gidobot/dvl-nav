@@ -784,12 +784,6 @@ class PathfinderEnsemble(PathfinderDVL):
         roll    = (self.ext_roll + self.BIAS_ROLL) * self.DEG_TO_RAD
         pitch   = (self.ext_pitch + self.BIAS_PITCH) * self.DEG_TO_RAD
 
-        # R1      = np.dot(self.Qz(heading),self.Qy(pitch))
-        # R2      = np.dot(R1, self.Qx(roll))
-        # V_earth = np.dot(R2,V_inst)
-        # u,v,w   = V_earth.flatten() 
-        # return(u,v,w)
-
         Qx = self.Qx(pitch)
         Qy = self.Qy(roll)
         Qz = self.Qz(-heading)
