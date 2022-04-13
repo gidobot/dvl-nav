@@ -39,14 +39,75 @@ BathyData = {
     },
 
     ##################################################
-    # Puerto Rico Data
+    # Puerto Rico Data Full 
     ##################################################
-    'Puerto_Rico' : {
-        'filepath'  : "/home/gburgess/dvl-nav/data/field_data/puerto_rico/bathy/PuertoRico_SouthWest.tif",
+    'Puerto_Rico_full' : {
+        'filepath'  : "/home/glider-sim/dvl-nav/data/field_data/puerto_rico/bathy/PuertoRico_SouthWest.tif",
         'latlon_format' : True,
         # 'crop'  : None,
         'crop'  : [700, 5500, 3500, 8500,],
         # 'crop'  : [3500, 4500, 1500, 3500],
+        # bathy = bathy_im[top:bot, left:right]
+        'name' : 'Puerto Rico',
+        'xlabel': 'Longitude [deg]',
+        'ylabel': 'Latitude [deg]',
+        'tick_format' : '%.2f',
+        # 'num_ticks' : None,
+        'num_ticks' : 3,
+        'slope_max' : None,
+        'depth_max' : None,
+        'depth_filter' : None,
+    },
+
+    ##################################################
+    # Puerto Rico Data Test Site #1
+    ##################################################
+    'Puerto_Rico_TS1' : {
+        'filepath'  : "/home/glider-sim/dvl-nav/data/field_data/puerto_rico/bathy/PuertoRico_SouthWest.tif",
+        'latlon_format' : True,
+        #'crop'  : [700, 5500, 3500, 8500], FULL
+        'crop'  : [900, 2000, 6000, 8500],
+        # bathy = bathy_im[top:bot, left:right]
+        'name' : 'Puerto Rico',
+        'xlabel': 'Longitude [deg]',
+        'ylabel': 'Latitude [deg]',
+        'tick_format' : '%.2f',
+        # 'num_ticks' : None,
+        'num_ticks' : 3,
+        'slope_max' : None,
+        'depth_max' : None,
+        'depth_filter' : None,
+    },
+
+    ##################################################
+    # Puerto Rico Data Shelf Area
+    ##################################################
+    'Puerto_Rico_SHELF' : {
+        'filepath'  : "/home/glider-sim/dvl-nav/data/field_data/puerto_rico/bathy/PuertoRico_SouthWest.tif",
+        'latlon_format' : True,
+        #'crop'  : [700, 5500, 3500, 8500], FULL
+        #TODO
+        'crop'  : [3500, 5000, 2000, 4000],
+        # bathy = bathy_im[top:bot, left:right]
+        'name' : 'Puerto Rico',
+        'xlabel': 'Longitude [deg]',
+        'ylabel': 'Latitude [deg]',
+        'tick_format' : '%.2f',
+        # 'num_ticks' : None,
+        'num_ticks' : 3,
+        'slope_max' : None,
+        'depth_max' : None,
+        'depth_filter' : None,
+    },
+
+    ##################################################
+    # Puerto Rico Data Off-Shelf Area
+    ##################################################
+    'Puerto_Rico_OFF_SHELF' : {
+        'filepath'  : "/home/glider-sim/dvl-nav/data/field_data/puerto_rico/bathy/PuertoRico_SouthWest.tif",
+        'latlon_format' : True,
+        #'crop'  : [700, 5500, 3500, 8500], FULL
+        'crop'  : [3700, 6500, 2100, 3400],
         # bathy = bathy_im[top:bot, left:right]
         'name' : 'Puerto Rico',
         'xlabel': 'Longitude [deg]',
