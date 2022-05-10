@@ -6,6 +6,7 @@
 #   2022-03-07  gburgess@mit.edu        Changed num_bins to 20 and switched to unit 770 biases
 #   2022-03-08  gburgess@mit.edu        added external sensor derived variables
 #   2022-04-06  gburgess@mit.edu        added more position vars for utm and lat/lon
+#   2022-04-26  gburgess@mit.edu        added var for derived speed of sound from ctd
 
 import numpy as np
 
@@ -30,12 +31,12 @@ class PathfinderDVL(object):
         # constants for the Pathfinder instrument 
         #   + set values for num_beams and num_bins for more efficient 
         #     array processing and ensemble storage. 
-        self.NUM_BEAMS_EXP = 4       # expected number of DVL beams  
-        #TODO Current unit770 explorer dvl set to 20 bins. 40 for kolumbo
-        self.NUM_BINS_EXP  = 20      # expected number of bins (or cells)
-        self.BAD_VELOCITY  = -32768  # value that represents invalid velocity 
-        self.BAD_BT_RANGE  = 0       # value that represents invalid range
-        self.MAX_ENS_NUM   = 65536   # max number of ensembles before rollover
+        self.NUM_BEAMS_EXP = 4          # expected number of DVL beams  
+        self.NUM_BINS_EXP  = 20         # expected number of bins (or cells)
+        self.BAD_VELOCITY  = -32768     # value that represents invalid velocity 
+        self.BAD_BT_RANGE  = 0          # value that represents invalid range
+        self.MAX_ENS_NUM   = 65536      # max number of ensembles before rollover
+        self.USED_SPEED_OF_SOUND = 1500 # constant speed of sound set in DVL [m/s]
 
         # mounting bias parameters 
 
@@ -138,7 +139,8 @@ class PathfinderDVL(object):
             'ahrs_heading',
             'ctd_depth',
             'ctd_temp',
-            'ctd_cond'
+            'ctd_cond',
+            'ctd_speed_of_sound'
         )
 
         # tuple of variables that are automatically reported by Pathfinder

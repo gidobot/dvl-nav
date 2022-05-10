@@ -10,6 +10,7 @@
 #   2022-03-09  gburgess@mit.edu        rotate water track and btm track velocities into earth frame
 #                                       commented out apply_mounting_biases -- rolled into instr_to_earth 
 #                                       function
+#   2022-05-10  gburgess@Mit.edu        Calculate Speed of Sound using CTD and correct DVL Velocities
 
 import numpy as np 
 import pandas as pd
@@ -502,11 +503,34 @@ class PathfinderEnsemble(PathfinderDVL):
         v0    = self.get_data(label_v) 
         w0    = self.get_data(label_w)
         #u,v,w = self.apply_mounting_bias_rotations((u0,v0,w0))
-        u,v,w = self.apply_instr_to_earth((u0,v0,w0))
+        u,v,w = self.apply_sound_speed_correction((u0,v0,w0))
+        u,v,w = self.apply_instr_to_earth((u,v,w))
         self.set_data(label_u, u)
         self.set_data(label_v, v)
         self.set_data(label_w, w)
  
+    def medwin_calculate_speed_of_sound(self, depth, temp, salinity):
+        # Based on H. Medwin (1975)
+        # Temp in degrees Celsius
+        # Depth in Meters
+        # Salinity in parts per thousand
+        speed_of_sound = 1449.2 + 4.6 * temp - 0.055 * temp**2 + 0.00029 * temp**3 + (1.34 - 0.01 * temp) * (salinity - 35) + 0.016 * depth
+        return speed_of_sound
+    
+    def apply_sound_speed_correction(self,v0):
+        u,v,w = v0
+        if self.ext_cond and self.ext_depth and self.ext_temp:
+            speed_of_sound = self.medwin_calculate_speed_of_sound(self.ext_depth, self.ext_temp, self.ext_cond*6.4)
+            scale_factor = self.USED_SPEED_OF_SOUND / speed_of_sound
+            u_scaled = u*scale_factor
+            v_scaled = v*scale_factor
+            w_scaled = w*scale_factor
+        else:
+            u_scaled = u
+            v_scaled = v
+            w_scaled = w
+        return (u_scaled, v_scaled, w_scaled)
+
 
     def parse_derived_variables(self):
         """Computes the derived variables specified in PathfinderDVL.
@@ -549,6 +573,13 @@ class PathfinderEnsemble(PathfinderDVL):
         if self.ext_cond:
             self.set_data('ctd_cond', self.ext_cond)
 
+        if self.ext_depth and self.ext_temp and self.ext_cond:
+            salinity_ppt = self.ext_cond * 6.4 # Convert Siemen/meter to parts per thousand
+            depth = float(self.ext_depth)
+            temp = float(self.ext_temp)
+            # print(type(salinity_ppt), type(depth), type(temp))
+            speed_of_sound_est = self.medwin_calculate_speed_of_sound(depth, temp, salinity_ppt)
+            self.set_data('ctd_speed_of_sound', speed_of_sound_est)
 
         # assume zero angle of attack
         self.set_data('angle_of_attack', 0)
@@ -588,15 +619,21 @@ class PathfinderEnsemble(PathfinderDVL):
             u_var = self.get_profile_var_name('velocity', bin_num, 0)
             v_var = self.get_profile_var_name('velocity', bin_num, 1)
             w_var = self.get_profile_var_name('velocity', bin_num, 2)
-            self.set_data('rel_vel_dvl_u', -self.get_data(u_var))
-            self.set_data('rel_vel_dvl_v', -self.get_data(v_var))
-            self.set_data('rel_vel_dvl_w',  self.get_data(w_var))
+            u = -self.get_data(u_var)
+            v = -self.get_data(v_var)
+            w =  self.get_data(w_var)
+            self.set_data('rel_vel_dvl_u', u)
+            self.set_data('rel_vel_dvl_v', v)
+            self.set_data('rel_vel_dvl_w',  w)
 
         # helper function for setting bottom track velocities
         def set_btm_abs_velocities():
-            self.set_data('abs_vel_btm_u', -self.btm_beam0_velocity)
-            self.set_data('abs_vel_btm_v', -self.btm_beam1_velocity)
-            self.set_data('abs_vel_btm_w',  self.btm_beam2_velocity)
+            u = -self.btm_beam0_velocity
+            v = -self.btm_beam1_velocity
+            w =  self.btm_beam2_velocity
+            self.set_data('abs_vel_btm_u', u)
+            self.set_data('abs_vel_btm_v', v)
+            self.set_data('abs_vel_btm_w', w)
 
     
         # helper function to update relative position 
@@ -915,7 +952,8 @@ class PathfinderEnsemble(PathfinderDVL):
                 # rotate velocity vector to account for pitch bias
                 if velocity0:
                     #u,v,w  = self.apply_mounting_bias_rotations(velocity0)
-                    u,v,w  = self.apply_instr_to_earth(velocity0)
+                    u,v,w  = self.apply_sound_speed_correction(velocity0)
+                    u,v,w  = self.apply_instr_to_earth((u,v,w))
                     xlabel = self.get_profile_var_name(var_name,bin_num,beam_u)
                     ylabel = self.get_profile_var_name(var_name,bin_num,beam_v)
                     zlabel = self.get_profile_var_name(var_name,bin_num,beam_w)
