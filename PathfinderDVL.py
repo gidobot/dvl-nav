@@ -7,6 +7,7 @@
 #   2022-03-08  gburgess@mit.edu        added external sensor derived variables
 #   2022-04-06  gburgess@mit.edu        added more position vars for utm and lat/lon
 #   2022-04-26  gburgess@mit.edu        added var for derived speed of sound from ctd
+#   2022-06-16  gburgess@mit.edu        added derived var for speed_magnitude
 
 import numpy as np
 
@@ -85,6 +86,7 @@ class PathfinderDVL(object):
             'rel_vel_dvl_u',
             'rel_vel_dvl_v',
             'rel_vel_dvl_w',
+            'speed_mag',
 
             # ocean current velocities (via propagation methods)
             'ocn_vel_u',

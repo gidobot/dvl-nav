@@ -154,16 +154,23 @@ def plot_odometry(ts, glider, save_name=None):
 def plot_m_odometry_dr(df_dbd, glider, save_name=None):
     sns.set(font_scale = 1.5)
     fig, ax = plt.subplots(figsize=(10,8))
+
+    # extract start_t position "origin" from the glider flight data 
+    for t in range(len(df_dbd)):
+        if not np.isnan(df_dbd.m_x_lmc[t]):
+            dbd_origin_x_lmc = df_dbd.m_x_lmc[t]
+            dbd_origin_y_lmc = df_dbd.m_y_lmc[t]
+            break
     sns.scatterplot(
-        df_dbd.m_gps_fix_x_lmc, 
-        df_dbd.m_gps_fix_y_lmc, 
+        df_dbd.m_gps_x_lmc- dbd_origin_x_lmc, 
+        df_dbd.m_gps_y_lmc - dbd_origin_y_lmc, 
         marker='X',
         color='tab:red', 
         s=300
     )
     sns.scatterplot(
-        x=df_dbd.m_x_lmc,
-        y=df_dbd.m_y_lmc,
+        x=df_dbd.m_x_lmc - dbd_origin_x_lmc,
+        y=df_dbd.m_y_lmc - dbd_origin_y_lmc,
         palette='viridis_r',
         hue=df_dbd.m_depth,
         linewidth=0,
@@ -513,33 +520,22 @@ def plot_profile_and_odometry_and_dr(ts_pd0, df_dbd, save_name=None):
 ###############################################################################
 # PLOT PROFILE AND ODOMETRY AND DEAD-RECKONED
 ###############################################################################
-def plot_profile_and_navigation(ts_pd0, df_dbd, save_name=None):
+def plot_navigation(ts_pd0, df_dbd, bathy_df, glider, save_name=None):
     sns.set(font_scale = 1.5)
-    fig, ax = plt.subplots(1,2, figsize=(15,8))
+    fig, ax = plt.subplots(figsize=(12,12))
 
-    #############################################
-    # PLOT PROFILE ##############################
-    #############################################
-    linewidth=8
-    sns.scatterplot(
-        ts_pd0.df.ros_timestamp, 
-        -ts_pd0.df.ctd_depth, 
-        ax=ax[0], 
-        linewidth=0,  
-        s=linewidth,
-        label='AUG Depth',
-        color='tab:orange',
-    )
-    sns.scatterplot(
-        ts_pd0.df.ros_timestamp, 
-        -ts_pd0.df.pc_bathy_depth,           
-        ax=ax[0], 
-        linewidth=0,
-        s=linewidth,  
-        label='Seafloor Depth',
-        color='tab:blue',
-    )
-
+    def get_utm_coords_from_glider_lat_lon(m_lat, m_lon):
+        SECS_IN_MIN = 60
+        MIN_OFFSET = 100
+        lat_min  = m_lat % MIN_OFFSET 
+        lon_min  = np.abs(m_lon) % MIN_OFFSET 
+        lat_dec  = (m_lat - lat_min)/MIN_OFFSET + lat_min/SECS_IN_MIN
+        lon_dec  = (m_lon + lon_min)/MIN_OFFSET - lon_min/SECS_IN_MIN
+        utm_pos  = utm.from_latlon(lat_dec, lon_dec)
+        easting  = round(utm_pos[0],2)
+        northing = round(utm_pos[1],2)
+        zone     = utm_pos[2]
+        return(easting, northing, zone)
 
     #############################################
     # PLOT ODOMETRY AND DEAD-RECKONED ###########
@@ -549,7 +545,15 @@ def plot_profile_and_navigation(ts_pd0, df_dbd, save_name=None):
         if not np.isnan(df_dbd.m_x_lmc[t]):
             dbd_origin_x_lmc = df_dbd.m_x_lmc[t]
             dbd_origin_y_lmc = df_dbd.m_y_lmc[t]
+            dbd_origin_m_lat = df_dbd.m_lat[t]
+            dbd_origin_m_lon = df_dbd.m_lon[t]
             break
+
+    dbd_utm_x, dbd_utm_y, _ = get_utm_coords_from_glider_lat_lon(
+        dbd_origin_m_lat, 
+        dbd_origin_m_lon
+    )
+    linewidth=8
     sns.scatterplot(
         ts_pd0.df.tan_pos_x,
         ts_pd0.df.tan_pos_y,
@@ -558,8 +562,7 @@ def plot_profile_and_navigation(ts_pd0, df_dbd, save_name=None):
         linewidth=0,
         s=linewidth,
         data=ts_pd0.df,
-        ax=ax[1],
-        zorder=2,
+        zorder=3,
     )
     sns.scatterplot(
         ts_pd0.df.rel_pos_x,
@@ -569,7 +572,6 @@ def plot_profile_and_navigation(ts_pd0, df_dbd, save_name=None):
         linewidth=0,
         s=linewidth,
         data=ts_pd0.df,
-        ax=ax[1],
         zorder=2,
     )
     sns.scatterplot(
@@ -580,7 +582,6 @@ def plot_profile_and_navigation(ts_pd0, df_dbd, save_name=None):
         linewidth=0,
         s=linewidth,
         data=df_dbd,
-        ax=ax[1],
         zorder=1,
     )
     sns.scatterplot(
@@ -591,32 +592,49 @@ def plot_profile_and_navigation(ts_pd0, df_dbd, save_name=None):
         label='GPS Fix',
         s=100,
         data=df_dbd,
-        ax=ax[1],
         zorder=5,
     )
 
+    sns.scatterplot(
+        ts_pd0.df.tan_update_x, 
+        ts_pd0.df.tan_update_y, 
+        zorder=4, 
+        marker='^', 
+        label='MF-TAN Fix',
+        s=60,
+    )
+    
+    plt.axis('equal')
+    x_lim = ax.get_xlim()
+    y_lim = ax.get_ylim()
+    # TODO temp plotting helper 
+    pitch_threshold = 35
+    tmp_slope_list = np.array(bathy_df.slope_list)
+    tmp_slope_list[tmp_slope_list >= pitch_threshold] = pitch_threshold
+    sns.scatterplot(
+        bathy_df.utm_x_list - dbd_utm_x,
+        bathy_df.utm_y_list - dbd_utm_y,
+        tmp_slope_list,
+        marker='s',
+        # palette='Purples',
+        palette='gray_r',
+        s=200,
+        linewidth=0,
+        zorder=0,
+        legend=False,
+    )
+    ax.set_xlim(x_lim)
+    ax.set_ylim(y_lim)
     # TODO -- can add marker for when TAN is able to recognize a feature
-    lgnd = ax[0].legend(frameon=True, framealpha=0.6, loc='best', 
-        fontsize='small')
-    lgnd.legendHandles[0]._sizes = [100]
-    lgnd.legendHandles[1]._sizes = [100]
-    lgnd = ax[1].legend(frameon=True, framealpha=0.6, loc='best', 
+    lgnd = ax.legend(frameon=True, framealpha=0.6, loc='lower left', 
         fontsize='small')
     lgnd.legendHandles[0]._sizes = [100]
     lgnd.legendHandles[1]._sizes = [100]
     lgnd.legendHandles[2]._sizes = [100]
     lgnd.legendHandles[3]._sizes = [200]
-    
-    ticks  = ax[0].get_xticks()
-    labels = [str(datetime.datetime.fromtimestamp(l)) for l in ticks]
-    labels = [l.split(' ',1)[1].rsplit(':',1)[0] for l in labels]
-    ax[0].set_xticklabels(labels)
-
-    dt = df_dbd.index[0].replace(microsecond=0)
-    plt.axis('equal')
-    plt.suptitle('DVL Odometry with Water Column Sensing', fontweight='bold')
-    ax[0].set_title('Dive Profile')
-    ax[1].set_title('Odometry in LMC')
+    lgnd.legendHandles[4]._sizes = [100]
+    dt = datetime.datetime.fromtimestamp(ts_pd0.df.ros_timestamp[0]).replace(microsecond=0)
+    plt.suptitle('DVL-ODO/MF-TAN: %s Puerto Rico %s' % (unit_name[glider], dt.isoformat()), fontweight='bold')
     plt.xlabel('X position [m]')
     plt.ylabel('Y position [m]')
     plt.subplots_adjust(wspace=0.3)
