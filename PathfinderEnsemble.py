@@ -544,7 +544,8 @@ class PathfinderEnsemble(PathfinderDVL):
         # MIN_PITCH   = 0.001
         MIN_PITCH   = 1.0
         EPSILON     = 0.001
-        MAX_SPEED   = 2.5 
+        # Theoretical Max Limit for Speed 
+        MAX_SPEED   = 1.00 # Experimental Max Limit for unit 770 in Puerto Rico is approx 1.0 m/s (35 deg, full thrust, full pump, terminal velocity to 500m dive)
 
         coordinate_frame = self.parse_coordinate_transformation(verbose=False)
         if (coordinate_frame != EARTH_FRAME) and (coordinate_frame != INSTRUMENT_FRAME):
@@ -580,9 +581,6 @@ class PathfinderEnsemble(PathfinderDVL):
             # print(type(salinity_ppt), type(depth), type(temp))
             speed_of_sound_est = self.medwin_calculate_speed_of_sound(depth, temp, salinity_ppt)
             self.set_data('ctd_speed_of_sound', speed_of_sound_est)
-
-        # assume zero angle of attack
-        self.set_data('angle_of_attack', 0)
 
         # previous ensemble not given
         #   + assume beginning of dive
@@ -674,6 +672,36 @@ class PathfinderEnsemble(PathfinderDVL):
             current_pitch = self.pitch
             current_heading = self.heading
         
+        # select DVL bin for through-water velocity 
+        #   + first two bins are less accurate in steady state conditions
+        #   + bins further away are more likely to have random outliers
+        for i in [2,1,0]:
+            if valid_bin_num(i) and self.get_speed(i) < MAX_SPEED:
+                set_dvl_rel_velocities(i)
+                current_speed = self.get_horizontal_speed(i)
+                break
+
+        # self.set_data('speed_mag', current_speed)          
+
+        # set bottom-track velocities (even if NaN)
+        set_btm_abs_velocities()
+
+        # Dynamic Angle of Attack Experimentation
+        # current_glider_path_angle = (13.76 * (current_speed**2)) + (37.02 * current_speed) + 0.3372
+        # if current_pitch > 0:
+        #     AoA = current_glider_path_angle - current_pitch
+        # else:
+        #     AoA = (-1*current_glider_path_angle) - current_pitch
+        # self.set_data('angle_of_attack', AoA)
+
+        #assume static angle of attack
+        # if current_pitch > 0:
+        #     AoA = 3
+        # else:
+        #     AoA = -3
+        # self.set_data('angle_of_attack', AoA)
+
+        self.set_data('angle_of_attack', 0)
 
         # computer horizontal velocity in relative frame 
         #   + avoid division by zero
@@ -686,7 +714,7 @@ class PathfinderEnsemble(PathfinderDVL):
 
             # horizontal velocity depends on pitch value
             rel_vel_h = self.rel_vel_pressure_w / \
-                        np.tan(-current_pitch*self.DEG_TO_RAD)
+                        np.tan(-current_pitch*self.DEG_TO_RAD - (self.get_data('angle_of_attack')*self.DEG_TO_RAD))
 
             rel_vel_u = rel_vel_h*np.sin(current_heading*self.DEG_TO_RAD)
             rel_vel_v = rel_vel_h*np.cos(current_heading*self.DEG_TO_RAD)
@@ -702,17 +730,6 @@ class PathfinderEnsemble(PathfinderDVL):
             self.set_data('rel_vel_pressure_u', np.NaN)
             self.set_data('rel_vel_pressure_v', np.NaN)
             self.set_data('rel_vel_pressure_w', np.NaN)
-
-        # select DVL bin for through-water velocity 
-        #   + first two bins are less accurate in steady state conditions
-        #   + bins further away are more likely to have random outliers
-        for i in [2,1,0]:
-            if valid_bin_num(i) and self.get_speed(i) < MAX_SPEED:
-                set_dvl_rel_velocities(i)
-                break           
-
-        # set bottom-track velocities (even if NaN)
-        set_btm_abs_velocities()
 
         # update relative position using bottom track velocity or DVL velocity
         if valid_bottom_track():
@@ -770,6 +787,13 @@ class PathfinderEnsemble(PathfinderDVL):
         v = self.get_data(self.get_profile_var_name('velocity', bin_num, y))
         w = self.get_data(self.get_profile_var_name('velocity', bin_num, z))
         return(np.linalg.norm([u,v,w]))
+
+    def get_horizontal_speed(self, bin_num):
+        x,y = 0,1
+        u = self.get_data(self.get_profile_var_name('velocity', bin_num, x))
+        v = self.get_data(self.get_profile_var_name('velocity', bin_num, y))
+        return(np.linalg.norm([u,v]))
+
 
 
     def convert_to_metric(self, variable, multiplier, attribute=True):
