@@ -504,6 +504,7 @@ class PathfinderEnsemble(PathfinderDVL):
         w0    = self.get_data(label_w)
         #u,v,w = self.apply_mounting_bias_rotations((u0,v0,w0))
         u,v,w = self.apply_sound_speed_correction((u0,v0,w0))
+        # DVL assumes bottom is moving, not vehicle. Hence sign flip for all velocities.
         u,v,w = self.apply_instr_to_earth((u,v,w))
         self.set_data(label_u, u)
         self.set_data(label_v, v)
@@ -542,10 +543,12 @@ class PathfinderEnsemble(PathfinderDVL):
         INSTRUMENT_FRAME = 'Instrument Coords'
         EARTH_FRAME = 'Earth Coords'
         # MIN_PITCH   = 0.001
-        MIN_PITCH   = 1.0
+        MIN_PITCH   = 0.0001
+        # MIN_PITCH   = 1.0
         EPSILON     = 0.001
         # Theoretical Max Limit for Speed 
-        MAX_SPEED   = 1.00 # Experimental Max Limit for unit 770 in Puerto Rico is approx 1.0 m/s (35 deg, full thrust, full pump, terminal velocity to 500m dive)
+        # MAX_SPEED   = 1.00 # Experimental Max Limit for unit 770 in Puerto Rico is approx 1.0 m/s (35 deg, full thrust, full pump, terminal velocity to 500m dive)
+        MAX_SPEED   = 1.3
 
         coordinate_frame = self.parse_coordinate_transformation(verbose=False)
         if (coordinate_frame != EARTH_FRAME) and (coordinate_frame != INSTRUMENT_FRAME):
@@ -617,18 +620,18 @@ class PathfinderEnsemble(PathfinderDVL):
             u_var = self.get_profile_var_name('velocity', bin_num, 0)
             v_var = self.get_profile_var_name('velocity', bin_num, 1)
             w_var = self.get_profile_var_name('velocity', bin_num, 2)
-            u = -self.get_data(u_var)
-            v = -self.get_data(v_var)
-            w =  self.get_data(w_var)
-            self.set_data('rel_vel_dvl_u', u)
-            self.set_data('rel_vel_dvl_v', v)
-            self.set_data('rel_vel_dvl_w',  w)
+            u = self.get_data(u_var)
+            v = self.get_data(v_var)
+            w = self.get_data(w_var)
+            self.set_data('rel_vel_dvl_u', -u)
+            self.set_data('rel_vel_dvl_v', -v)
+            self.set_data('rel_vel_dvl_w',  -w)
 
         # helper function for setting bottom track velocities
         def set_btm_abs_velocities():
             u = -self.btm_beam0_velocity
             v = -self.btm_beam1_velocity
-            w =  self.btm_beam2_velocity
+            w = -self.btm_beam2_velocity
             self.set_data('abs_vel_btm_u', u)
             self.set_data('abs_vel_btm_v', v)
             self.set_data('abs_vel_btm_w', w)
@@ -840,18 +843,19 @@ class PathfinderEnsemble(PathfinderDVL):
         u0,v0,w0       = velocity0
         V_inst         = np.array([[u0], [v0], [w0]])
         
-        # rotate velocities from instrument Coords <u, v, w> to Earth Coords <E, N, U>
-        heading = (self.ext_heading + self.BIAS_HEADING) * self.DEG_TO_RAD
+        # rotate velocities from instrument Coords y (FWS), x (STBD), z (DOWN) to Earth Coords <E, N, U>
+        # heading is made negativ ebecause AHRS measures yaw with z down ship frame notation (CW) whereas U is up and yaw should be CCW
+        heading = (self.ext_heading + self.BIAS_HEADING) * self.DEG_TO_RAD*-1
         roll    = (self.ext_roll + self.BIAS_ROLL) * self.DEG_TO_RAD
         pitch   = (self.ext_pitch + self.BIAS_PITCH) * self.DEG_TO_RAD
 
         Qx = self.Qx(pitch)
         Qy = self.Qy(roll)
-        Qz = self.Qz(-heading)
-        R1 = np.dot(Qx, V_inst)
-        R2 = np.dot(Qy, R1)
-        V_earth = np.dot(Qz, R2)
-        u,v,w = V_earth.flatten()
+        Qz = self.Qz(heading)
+        R1 = np.dot(Qy, V_inst)
+        R2 = np.dot(Qx, R1)
+        V_ENU = np.dot(Qz, R2)
+        u,v,w = V_ENU.flatten()
 
         return(u,v,w)
 
