@@ -625,7 +625,7 @@ class PathfinderEnsemble(PathfinderDVL):
             w = self.get_data(w_var)
             self.set_data('rel_vel_dvl_u', -u)
             self.set_data('rel_vel_dvl_v', -v)
-            self.set_data('rel_vel_dvl_w',  -w)
+            self.set_data('rel_vel_dvl_w', -w)
 
         # helper function for setting bottom track velocities
         def set_btm_abs_velocities():

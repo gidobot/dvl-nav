@@ -500,8 +500,8 @@ def plot_profile_and_odometry_and_dr(ts_pd0, df_dbd, bathy_df, voc_u_list, voc_v
         zorder=4,
     )
     sns.scatterplot(
-        x=df_dbd.m_x_lmc - dbd_origin_x_lmc,
-        y=df_dbd.m_y_lmc - dbd_origin_y_lmc,
+        x=df_dbd.utm_dr_x - dbd_utm_x,
+        y=df_dbd.utm_dr_y - dbd_utm_y,
         color='tab:blue',
         label='DR-DACC',
         linewidth=0,
@@ -511,8 +511,8 @@ def plot_profile_and_odometry_and_dr(ts_pd0, df_dbd, bathy_df, voc_u_list, voc_v
         zorder=2,
     )
     sns.scatterplot(
-        x=df_dbd.m_gps_x_lmc - dbd_origin_x_lmc, 
-        y=df_dbd.m_gps_y_lmc - dbd_origin_y_lmc,
+        x=df_dbd.utm_gps_x - dbd_utm_x, 
+        y=df_dbd.utm_gps_y - dbd_utm_y,
         marker='X',
         color='tab:red', 
         label='GPS Fix',
@@ -665,8 +665,8 @@ def plot_navigation(ts_pd0, df_dbd, bathy_df, glider, save_name=None):
         zorder=2,
     )
     sns.scatterplot(
-        x=df_dbd.m_x_lmc - dbd_origin_x_lmc,
-        y=df_dbd.m_y_lmc - dbd_origin_y_lmc,
+        x=df_dbd.utm_dr_x - dbd_utm_x,
+        y=df_dbd.utm_dr_y - dbd_utm_y,
         color='mediumorchid',
         label='Dead Reckoned',
         linewidth=0,
@@ -675,8 +675,8 @@ def plot_navigation(ts_pd0, df_dbd, bathy_df, glider, save_name=None):
         zorder=1,
     )
     sns.scatterplot(
-        x=df_dbd.m_gps_x_lmc - dbd_origin_x_lmc, 
-        y=df_dbd.m_gps_y_lmc - dbd_origin_y_lmc,
+        x=df_dbd.utm_gps_x - dbd_utm_x, 
+        y=df_dbd.utm_gps_y - dbd_utm_y,
         marker='X',
         color='tab:red', 
         label='GPS Fix',
@@ -869,8 +869,8 @@ def plot_profile_and_odometry_and_dr_and_three_factors(ts_pd0, df_dbd,
             zorder=2,
         )
         sns.scatterplot(
-            x=df_dbd.m_x_lmc - dbd_origin_x_lmc,
-            y=df_dbd.m_y_lmc - dbd_origin_y_lmc,
+            x=df_dbd.utm_dr_x- dbd_utm_x,
+            y=df_dbd.utm_dr_y - dbd_utm_y,
             color='hotpink',
             label='DR-DACC',
             linewidth=0,
@@ -880,8 +880,8 @@ def plot_profile_and_odometry_and_dr_and_three_factors(ts_pd0, df_dbd,
             zorder=1,
         )
         sns.scatterplot(
-            x=df_dbd.m_gps_x_lmc - dbd_origin_x_lmc, 
-            y=df_dbd.m_gps_y_lmc - dbd_origin_y_lmc,
+            x=df_dbd.utm_gps_x - dbd_utm_x, 
+            y=df_dbd.utm_gps_y - dbd_utm_y,
             marker='X',
             color='tab:red', 
             label='GPS Fix',
