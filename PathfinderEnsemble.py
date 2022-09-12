@@ -15,6 +15,7 @@
 import numpy as np 
 import pandas as pd
 import scipy
+import scipy.linalg
 import struct
 import sys
 from datetime import datetime
@@ -678,7 +679,7 @@ class PathfinderEnsemble(PathfinderDVL):
         # select DVL bin for through-water velocity 
         #   + first two bins are less accurate in steady state conditions
         #   + bins further away are more likely to have random outliers
-        for i in [2,1,0]:
+        for i in [0,1,2]:
             if valid_bin_num(i) and self.get_speed(i) < MAX_SPEED:
                 set_dvl_rel_velocities(i)
                 current_speed = self.get_horizontal_speed(i)
@@ -842,6 +843,9 @@ class PathfinderEnsemble(PathfinderDVL):
     def apply_instr_to_earth(self, velocity0):
         u0,v0,w0       = velocity0
         V_inst         = np.array([[u0], [v0], [w0]])
+        
+        if self.ext_heading is None:
+            return (u0,v0,w0)
         
         # rotate velocities from instrument Coords y (FWS), x (STBD), z (DOWN) to Earth Coords <E, N, U>
         # heading is made negativ ebecause AHRS measures yaw with z down ship frame notation (CW) whereas U is up and yaw should be CCW

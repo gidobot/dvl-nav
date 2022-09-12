@@ -381,3 +381,24 @@ class SlocumFlightController(object):
         print('>> Finished Parsing!')
         return ts
 
+
+    def save_as_csv(self, name=None, directory='./'):
+        """Saves the DataFrame to csv file. 
+
+        Args:
+            name: name used when saving the file.
+            directory: string directory to save the DataFrame to.
+        """
+        # update name if not given
+        if name is None:
+            name = self.name 
+
+        # add ensembles to the DataFrame if they haven't been added yet
+        if self.ensemble_list:
+            self.to_dataframe()
+
+        # save DataFrame to csv file
+        if self.df is not None:
+            self.df.to_csv(directory+name+'.CSV')
+        else:
+            print("WARNING: No data to save.")
